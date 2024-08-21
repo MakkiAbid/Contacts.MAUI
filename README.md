@@ -12,13 +12,13 @@ Contacts.MAUI is a cross-platform mobile application built with .NET MAUI (Multi
 
 ## Screenshots
 
-<img src="screenshots/home_screen.jpg" alt="Home Screen" width="400" height="300">
+<img src="screenshots/home_screen.jpg" alt="Home Screen" width="412" height="915">
 *Caption*: The home screen of the app showing the contact list.
 
-<img src="screenshots/add_contact.jpg" alt="Add Contact" width="400" height="300">
+<img src="screenshots/add_contact.jpg" alt="Add Contact" width="412" height="915">
 *Caption*: The add contact screen, where users can enter new contact details.
 
-<img src="screenshots/edit_contact.jpg" alt="Edit Contact" width="400" height="300">
+<img src="screenshots/edit_contact.jpg" alt="Edit Contact" width="412" height="915">
 *Caption*: The edit contact screen, allowing users to modify existing contacts.
 
 ## Installation
