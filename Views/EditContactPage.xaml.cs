@@ -12,22 +12,25 @@ public partial class EditContactPage : ContentPage
 		InitializeComponent();
 	}
 
-    private void btnCancel_Clicked(object sender, EventArgs e)
+    private async void btnCancel_Clicked(object sender, EventArgs e)
     {
-        //Head back to main page using ..
-        //    OR
-        //using String INTERPOLATION $
-
-        //Shell.Current.GoToAsync("..");
-        Shell.Current.GoToAsync($"//{nameof(ContactsPage)}");
+        await Shell.Current.GoToAsync($"//{nameof(ContactsPage)}");
     }
 
     public string ContactId
     {
         set
         {
-            contact = ContactRepository.GetContactById(int.Parse(value));
-            //lblName.Text = contact.Name;
+            LoadContactAsync(value);
+        }
+    }
+
+    // Method to load contact details from API
+    private async Task LoadContactAsync(string contactId)
+    {
+        try
+        {
+            contact = await ContactService.GetContactByIdAsync(int.Parse(contactId));
             if (contact != null)
             {
                 contactCtrl.Name = contact.Name;
@@ -35,24 +38,36 @@ public partial class EditContactPage : ContentPage
                 contactCtrl.Phone = contact.Phone;
                 contactCtrl.Address = contact.Address;
             }
-
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", ex.Message, "OK");
         }
     }
 
-    private void btnUpdate_Clicked(object sender, EventArgs e)
-    { 
-        contact.Name = contactCtrl.Name;
-        contact.Email = contactCtrl.Email;
-        contact.Phone = contactCtrl.Phone;
-        contact.Address = contactCtrl.Address;
+    private async void btnUpdate_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            if (contact != null)
+            {
+                contact.Name = contactCtrl.Name;
+                contact.Email = contactCtrl.Email;
+                contact.Phone = contactCtrl.Phone;
+                contact.Address = contactCtrl.Address;
 
-        ContactRepository.UpdateContact(contact.ContactId, contact);
-        Shell.Current.GoToAsync($"//{nameof(ContactsPage)}");
-
+                await ContactService.UpdateContactAsync(contact.ContactId, contact);
+                await Shell.Current.GoToAsync($"//{nameof(ContactsPage)}");
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", ex.Message, "OK");
+        }
     }
 
-    private void contactCtrl_OnError(object sender, string e)
+    private async void contactCtrl_OnError(object sender, string e)
     {
-        DisplayAlert("Error", e, "OK");
+        await DisplayAlert("Error", e, "OK");
     }
 }

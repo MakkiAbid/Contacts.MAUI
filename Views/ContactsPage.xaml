@@ -22,22 +22,26 @@
             x:Name="listContacts" 
             BackgroundColor="Transparent"
             SeparatorColor="Silver"
-            RowHeight="65"
+            RowHeight="80"
             ItemSelected="listContacts_ItemSelected"
             ItemTapped="listContacts_ItemTapped">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextCell 
-                        Text="{Binding Name}"
-                        Detail="{Binding Email}">
-                        <TextCell.ContextActions>
-                            <MenuItem 
-                                Text="Delete"
-                                IsDestructive="True"
-                                Clicked="DeleteContact_Clicked"
-                                CommandParameter="{Binding .}"></MenuItem>
-                        </TextCell.ContextActions>
-                    </TextCell>
+                    <ViewCell>
+                        <StackLayout Padding="10">
+                            <Label Text="{Binding Name}" FontSize="14" FontAttributes="Bold"/>
+                            <Label Text="{Binding Email}" FontSize="12"/>
+                            <Label Text="{Binding Phone}" FontSize="8" TextColor="Gray"/>
+                            <Label Text="{Binding Address}" FontSize="8" TextColor="Gray"/>
+                        </StackLayout>
+                        <ViewCell.ContextActions>
+                                <MenuItem 
+                            Text="Delete"
+                            IsDestructive="True"
+                            Clicked="DeleteContact_Clicked"
+                            CommandParameter="{Binding .}"></MenuItem>
+                        </ViewCell.ContextActions>
+                    </ViewCell>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

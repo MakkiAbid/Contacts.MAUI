@@ -7,29 +7,27 @@ namespace Contacts.MAUI.Views;
 
 public partial class ContactsPage : ContentPage
 {
-	public ContactsPage()
-	{
-		InitializeComponent();
- 
-	}
-
-    protected override void OnAppearing()
+    public ContactsPage()
     {
-        //refreshed Contacts View every time it appears
+        InitializeComponent();
+    }
+
+    protected override async void OnAppearing()
+    {
         base.OnAppearing();
 
+        // Clear the SearchBar text and load contacts
         SearchBar.Text = string.Empty;
-
-        LoadContacts();
+        await LoadContactsAsync();
     }
 
     private async void listContacts_ItemSelected(object sender, SelectedItemChangedEventArgs e)
     {
         if (listContacts.SelectedItem != null)
         {
-            await Shell.Current.GoToAsync($"{nameof(EditContactPage)}?Id={((Contact)listContacts.SelectedItem).ContactId}");
+            var selectedContact = (Contact)listContacts.SelectedItem;
+            await Shell.Current.GoToAsync($"{nameof(EditContactPage)}?Id={selectedContact.ContactId}");
         }
-        
     }
 
     private void listContacts_ItemTapped(object sender, ItemTappedEventArgs e)
@@ -37,45 +35,43 @@ public partial class ContactsPage : ContentPage
         listContacts.SelectedItem = null;
     }
 
-    private void btnAdd_Clicked(object sender, EventArgs e)
+    private async void btnAdd_Clicked(object sender, EventArgs e)
     {
-        Shell.Current.GoToAsync(nameof(AddContactPage));
+        await Shell.Current.GoToAsync(nameof(AddContactPage));
     }
 
-    private void DeleteContact_Clicked(object sender, EventArgs e)
+    private async void DeleteContact_Clicked(object sender, EventArgs e)
     {
         var menuItem = sender as MenuItem;
         var contact = menuItem.CommandParameter as Contact;
-        ContactRepository.DeleteContact(contact.ContactId);
 
-        LoadContacts();
+        if (contact != null)
+        {
+            // Call delete method from ContactService
+            await ContactService.DeleteContactAsync(contact.ContactId);
+
+            // Refresh the contact list
+            await LoadContactsAsync();
+        }
     }
 
-    private void LoadContacts()
+    private async Task LoadContactsAsync()
     {
-        //You have to notify the view that change has been made -- AJEEB
-        // F**K DELETE functionality was not working just because of observable collection shit
-        var contacts = new ObservableCollection<Contact>(ContactRepository.GetContacts());
+        // Fetch contacts from the API
+        var contacts = await ContactService.GetAllContactsAsync();
 
-        listContacts.ItemsSource = contacts;
+        // Bind contacts to the ListView
+        listContacts.ItemsSource = new ObservableCollection<Contact>(contacts);
     }
 
-    private void SearchBar_TextChanged(object sender, TextChangedEventArgs e)
+    private async void SearchBar_TextChanged(object sender, TextChangedEventArgs e)
     {
-       var contacts = new ObservableCollection<Contact>(ContactRepository.SearchContacts(((SearchBar)sender).Text));
-       listContacts.ItemsSource = contacts;
+        var filterText = ((SearchBar)sender).Text;
+
+        // Fetch filtered contacts from the API
+        var contacts = await ContactService.SearchContactsAsync(filterText);
+
+        // Bind filtered contacts to the ListView
+        listContacts.ItemsSource = new ObservableCollection<Contact>(contacts);
     }
-
-
-
-    // Event Handlers for URI Routing
-    //private void btnEditContact_Clicked(object sender, EventArgs e)
-    //{
-    //    Shell.Current.GoToAsync(nameof(EditContactPage));
-    //}
-
-    //private void btnAddContact_Clicked(object sender, EventArgs e)
-    //{
-    //    Shell.Current.GoToAsync(nameof(AddContactPage));
-    //}
 }

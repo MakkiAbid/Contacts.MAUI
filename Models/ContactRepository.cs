@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,84 +9,70 @@ namespace Contacts.MAUI.Models
 {
     public static class ContactRepository
     {
-        public static List<Contact> _contacts = new List<Contact>()
+        public static async Task<List<Contact>> GetContactsAsync()
         {
-            new Contact {ContactId = 1, Name="Makki", Email="makki@gmail.com", Phone="03039373093", Address="Gulgasht"},
-            new Contact {ContactId = 2, Name="Zubi", Email="zubi@gmail.com", Phone="03039373093", Address="Gulgasht"},
-            new Contact {ContactId = 3, Name="Madni", Email="madni@gmail.com", Phone="03039373093", Address="Gulgasht"}
+            // API URL
+            string apiUrl = "https://66cc6073a4dd3c8a71b7664b.mockapi.io/Contacts";
 
-        };
-
-        public static List<Contact> GetContacts() => _contacts;
-
-        public static Contact GetContactById(int contactId)
-        {
-            var contact = _contacts.FirstOrDefault(x => x.ContactId == contactId);
-            if(contact != null)
+            // Create an instance of HttpClient
+            using (HttpClient client = new HttpClient())
             {
-                return new Contact
-                {
-                    ContactId = contactId,
-                    Name = contact.Name,
-                    Email = contact.Email,  
-                    Phone = contact.Phone,
-                    Address = contact.Address
-                };
-            }
+                // Send a GET request to the API and wait for the response
+                HttpResponseMessage response = await client.GetAsync(apiUrl);
 
-            return null;
+                // If the response is successful (status code 200)
+                if (response.IsSuccessStatusCode)
+                {
+                    // Read the response content as a string
+                    string responseData = await response.Content.ReadAsStringAsync();
+
+                    // Convert the JSON response into a list of Contact objects
+                    List<Contact> contacts = JsonConvert.DeserializeObject<List<Contact>>(responseData);
+
+                    return contacts;
+                }
+                else
+                {
+                    // Handle the error (e.g., return an empty list or throw an exception)
+                    return new List<Contact>();
+                }
+            }
         }
 
-        public static void UpdateContact(int contactId, Contact contact) 
+
+        public static async Task<Contact> GetContactByIdAsync(int contactId)
+        {
+            // Call the service method to get the contact from the API
+            var contact = await ContactService.GetContactByIdAsync(contactId);
+
+            // Return the contact if found, otherwise return null
+            return contact;
+        }
+
+        public static async Task UpdateContact(int contactId, Contact contact) 
         {
             if (contactId != contact.ContactId) return;
 
-            var contactToUpdate = _contacts.FirstOrDefault(x => x.ContactId == contactId);
-            if (contactToUpdate != null)
-            {
-                //also check AUTOMAPPER if you want
-                contactToUpdate.Name = contact.Name;
-                contactToUpdate.Email = contact.Email;
-                contactToUpdate.Phone = contact.Phone;
-                contactToUpdate.Address = contact.Address;
-            }
+            // Call the service method to update the contact via the API
+            await ContactService.UpdateContactAsync(contactId, contact);
         }
 
-        public static void AddContact(Contact contact)
+        public static async Task AddContact(Contact contact)
         {
-            var maxId = _contacts.Max(x => x.ContactId);
-            contact.ContactId = maxId + 1;
-            _contacts.Add(contact);
+            // Call the service method to add the contact via the API
+            await ContactService.AddContactAsync(contact);
         }
 
-        public static void DeleteContact(int contactId)
+        public static async Task DeleteContact(int contactId)
         {
-            var contact = _contacts.FirstOrDefault(x => x.ContactId == contactId);
-            if(contact != null)
-            {
-                _contacts.Remove(contact);
-            }
+            // Call the service method to delete the contact via the API
+            await ContactService.DeleteContactAsync(contactId);
         }
 
-        public static List<Contact> SearchContacts(string filterText)
-        {
-            var contacts = _contacts.Where(x => !string.IsNullOrWhiteSpace(x.Name) && x.Name.StartsWith(filterText, StringComparison.OrdinalIgnoreCase))?.ToList();
 
-            if(contacts == null ||  contacts.Count <= 0)
-                contacts = _contacts.Where(x => !string.IsNullOrWhiteSpace(x.Email) && x.Email.StartsWith(filterText, StringComparison.OrdinalIgnoreCase))?.ToList();
-            else
-                return contacts;
-            if (contacts == null || contacts.Count <= 0)
-                contacts = _contacts.Where(x => !string.IsNullOrWhiteSpace(x.Phone) && x.Phone.StartsWith(filterText, StringComparison.OrdinalIgnoreCase))?.ToList();
-            else
-                return contacts;
-            if (contacts == null || contacts.Count <= 0)
-                contacts = _contacts.Where(x => !string.IsNullOrWhiteSpace(x.Address) && x.Address.StartsWith(filterText, StringComparison.OrdinalIgnoreCase))?.ToList();
-            else
-                return contacts;
 
-            return contacts;
-        }
+
+
 
 
     }

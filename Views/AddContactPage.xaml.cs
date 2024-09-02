@@ -1,40 +1,51 @@
 using Contacts.MAUI.Models;
+using System;
+using System.Threading.Tasks;
+using Contact = Contacts.MAUI.Models.Contact;
 
-namespace Contacts.MAUI.Views;
-
-public partial class AddContactPage : ContentPage
+namespace Contacts.MAUI.Views
 {
-	public AddContactPage()
-	{
-		InitializeComponent();
-	}
-
-    private void btnCancel_Clicked(object sender, EventArgs e)
+    public partial class AddContactPage : ContentPage
     {
-		Shell.Current.GoToAsync("..");
-    }
-
-    private void contactCtrl_OnSave(object sender, EventArgs e)
-    {
-        ContactRepository.AddContact(new Models.Contact
+        public AddContactPage()
         {
-            Name = contactCtrl.Name, 
-            Email = contactCtrl.Email,
-            Phone = contactCtrl.Phone,
-            Address = contactCtrl.Address
-        });
+            InitializeComponent();
+        }
 
-        Shell.Current.GoToAsync($"//{nameof(ContactsPage)}");
+        private async void btnCancel_Clicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("..");
+        }
 
-    }
+        private async void contactCtrl_OnSave(object sender, EventArgs e)
+        {
+            try
+            {
+                var newContact = new Contact
+                {
+                    Name = contactCtrl.Name,
+                    Email = contactCtrl.Email,
+                    Phone = contactCtrl.Phone,
+                    Address = contactCtrl.Address
+                };
 
-    private void contactCtrl_OnCancel(object sender, EventArgs e)
-    {
-        Shell.Current.GoToAsync($"//{nameof(ContactsPage)}");
-    }
+                await ContactService.AddContactAsync(newContact);
+                await Shell.Current.GoToAsync($"//{nameof(ContactsPage)}");
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", ex.Message, "OK");
+            }
+        }
 
-    private void contactCtrl_OnError(object sender, string e)
-    {
-        DisplayAlert("Error", e, "OK");
+        private async void contactCtrl_OnCancel(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync($"//{nameof(ContactsPage)}");
+        }
+
+        private async void contactCtrl_OnError(object sender, string e)
+        {
+            await DisplayAlert("Error", e, "OK");
+        }
     }
 }

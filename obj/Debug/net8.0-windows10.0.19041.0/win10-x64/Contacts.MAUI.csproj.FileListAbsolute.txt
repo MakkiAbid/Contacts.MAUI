@@ -179,3 +179,5 @@ C:\Users\Makki\source\repos\Contacts.MAUI\obj\Debug\net8.0-windows10.0.19041.0\w
 C:\Users\Makki\source\repos\Contacts.MAUI\bin\Debug\net8.0-windows10.0.19041.0\win10-x64\CommunityToolkit.Maui.dll
 C:\Users\Makki\source\repos\Contacts.MAUI\bin\Debug\net8.0-windows10.0.19041.0\win10-x64\CommunityToolkit.Maui.Core.dll
 C:\Users\Makki\source\repos\Contacts.MAUI\bin\Debug\net8.0-windows10.0.19041.0\win10-x64\System.Speech.dll
+C:\Users\Makki\source\repos\Contacts.MAUI\obj\Debug\net8.0-windows10.0.19041.0\win10-x64\Contacts.MAUI.sourcelink.json
+C:\Users\Makki\source\repos\Contacts.MAUI\bin\Debug\net8.0-windows10.0.19041.0\win10-x64\Newtonsoft.Json.dll
